@@ -4,31 +4,27 @@ import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 import org.json4s.native.Serialization
 import org.json4s.native.Serialization.{write,read}
 import org.json4s._
+import scala.util.Random
 
 
 case class PeaceWatcher(kafkaProducer: KafkaProducer[String,String]){
   def sendMessage = () => {
 
-    val messages = List(
-      Message(0,Coords(12,10),List[Person](
-        Person("tom",5),
-        Person("tom",3)
-      )),
-      Message(0,Coords(12,10),List[Person](
-        Person("tom",2),
-        Person("tom",7)
-      )),
-      Message(0,Coords(12,10),List[Person](
-        Person("tom",8),
-      )),
-    )
-
-
     val topic="quickstart-events"
 
-    messages.foreach((el) => {
-      val record = new ProducerRecord(topic, "key", el.toJson())
+
+    (0 to 100).foreach((i) => {
+      val id = Random.nextInt(100)
+      val lat = Random.nextFloat*30
+      val lon = Random.nextFloat*30
+      val nb_people = Random.nextInt(5)+1
+      val people: List[Person] = (0 to nb_people).map(i => Person(Random.alphanumeric.take(10).mkString, Math.min(10,Random.nextInt(10)+2))).toList
+
+      val message = Message(id,Coords(lat,lon),people)
+      val record = new ProducerRecord(topic, "key", message.toJson())
+      println(message.toJson())
       kafkaProducer.send(record)
+      Thread.sleep(2000)
     })
   }
 }
