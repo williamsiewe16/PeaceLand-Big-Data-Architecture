@@ -11,7 +11,7 @@ import scala.util.Random
 object Main {
 
   val resource_dir = "data"
-  val timeout = 10
+  val batchTime = 10
 
   def main(args: Array[String]): Unit = {
 
@@ -26,18 +26,17 @@ object Main {
       "bootstrap.servers" -> "localhost:9092",
       "key.deserializer"-> "org.apache.kafka.common.serialization.StringDeserializer",
       "value.deserializer" -> "org.apache.kafka.common.serialization.StringDeserializer",
-      "group.id" -> "datalake",
-      /*"auto.offset.reset" -> "latest",
-      "enable.auto.commit" -> false*/
+      "group.id" -> "datalake"
     )
 
-    val ssc = new StreamingContext(sparkConf, Seconds(timeout))
+    val ssc = new StreamingContext(sparkConf, Seconds(batchTime))
 
     val stream = KafkaUtils.createDirectStream[String, String](
       ssc,
       PreferConsistent,
       Subscribe[String,String](topic,kafkaParams)
     ).map(_.value)
+      //.saveAsTextFiles("")
       .foreachRDD(rdd => {
         if(!rdd.isEmpty()) rdd.saveAsTextFile(s"${resource_dir}/test-${Random.alphanumeric.take(10).mkString}.json")
       })

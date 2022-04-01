@@ -10,7 +10,8 @@ case class Person(nom: String, peaceScore: Double)
 case class Message(
                     id : Int,
                     location: Coords,
-                    surroundingPeople: List[Person]
+                    surroundingPeople: List[Person],
+                    time: Long
                   ){
   def toJson(): String = {
     implicit val formats = Serialization.formats(NoTypeHints)

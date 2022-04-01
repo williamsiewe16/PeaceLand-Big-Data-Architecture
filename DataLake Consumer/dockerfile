@@ -1,0 +1,22 @@
+FROM ubuntu
+
+RUN apt -y update \
+&& apt -y upgrade \
+&& apt install -y openjdk-11-jdk \
+&& apt install -y wget \
+&& apt install -y curl \
+&& apt install -y nano
+
+RUN apt install -y gnupg \
+&& apt install unzip \
+&& curl -L -o sbt-1.6.2.zip https://github.com/sbt/sbt/releases/download/v1.6.2/sbt-1.6.2.zip \
+&& unzip sbt-1.6.2.zip -d ops
+
+ADD . /app/
+
+RUN wget https://downloads.apache.org/spark/spark-3.1.2/spark-3.1.2-bin-hadoop3.2.tgz \
+&& tar -zxvf spark-*.tgz
+
+WORKDIR /app/
+
+CMD /ops/sbt/bin/sbt run

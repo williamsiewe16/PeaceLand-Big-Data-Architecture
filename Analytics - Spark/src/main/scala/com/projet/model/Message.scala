@@ -2,13 +2,15 @@ package com.projet.model
 
 import org.json4s.NoTypeHints
 import org.json4s.jackson.Serialization
-import org.json4s.jackson.Serialization.{read,write}
+import org.json4s.jackson.Serialization.{read, write}
 
-
+case class Coords(latitude: Double, longitude: Double)
+case class Person(nom: String, peaceScore: Double)
 case class Message(
                     id : Int,
-                    location: Map[String, Double],
-                    surroundingPeople: List[Map[String, Any]]
+                    location: Coords,
+                    surroundingPeople: List[Person],
+                    time: Long
                   ){
   def toJson(): String = {
     implicit val formats = Serialization.formats(NoTypeHints)
