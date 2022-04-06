@@ -3,11 +3,12 @@ import matplotlib.pyplot as plt
 import streamlit as st
 import requests
 import pandas as pd
+import argparse
 
 
 #@st.cache
 def init():
-    url = "http://localhost:9001/api/analytics"
+    url = "http://172.18.0.7:9001/api/analytics"
     res = requests.get(url)
     
     if res.status_code == 200:
@@ -56,6 +57,10 @@ def dashboard(data):
 
 def main():
 
+    parser = argparse.ArgumentParser()
+    args = parser.parse_args()
+    print(args)
+    
     data = init()
 
     if data:

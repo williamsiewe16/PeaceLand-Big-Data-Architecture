@@ -12,11 +12,19 @@ RUN apt install -y gnupg \
 && curl -L -o sbt-1.6.2.zip https://github.com/sbt/sbt/releases/download/v1.6.2/sbt-1.6.2.zip \
 && unzip sbt-1.6.2.zip -d ops
 
-ADD . /app/
 
 RUN wget https://downloads.apache.org/spark/spark-3.1.2/spark-3.1.2-bin-hadoop3.2.tgz \
-&& tar -zxvf spark-*.tgz
+&& tar -zxvf spark-*.tgz 
+
+ADD . /app/
 
 WORKDIR /app/
 
+RUN /ops/sbt/bin/sbt compile
+
+#/spark-3.1.2-bin-hadoop3.2/bin/spark-submit --class com.projet.Main --master local[*] spark-analytics_2.13-1.0.jar
+
+#CMD while true; do sleep 1; done    
 CMD /ops/sbt/bin/sbt run
+
+#CMD bash

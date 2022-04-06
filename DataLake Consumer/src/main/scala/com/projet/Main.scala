@@ -15,6 +15,7 @@ object Main {
 
   def main(args: Array[String]): Unit = {
 
+    val server = if(args.size != 0) args(0) else "localhost"
     val topic=Array("quickstart-events")
 
     val sparkConf = new SparkConf()
@@ -23,13 +24,14 @@ object Main {
       .set("spark.driver.host","127.0.0.1")
 
     val kafkaParams = Map[String, Object](
-      "bootstrap.servers" -> "localhost:9092",
+      "bootstrap.servers" -> s"$server:9092",
       "key.deserializer"-> "org.apache.kafka.common.serialization.StringDeserializer",
       "value.deserializer" -> "org.apache.kafka.common.serialization.StringDeserializer",
       "group.id" -> "datalake"
     )
 
-    val ssc = new StreamingContext(sparkConf, Seconds(batchTime))
+    val finalBatchTime = if(args.size > 1) args(1).toInt else batchTime
+    val ssc = new StreamingContext(sparkConf, Seconds(finalBatchTime))
 
     val stream = KafkaUtils.createDirectStream[String, String](
       ssc,

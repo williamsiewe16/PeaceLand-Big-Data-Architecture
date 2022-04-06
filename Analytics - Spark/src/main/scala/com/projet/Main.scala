@@ -7,25 +7,22 @@ import org.apache.spark._
 import com.projet.router.router
 
 import java.util.Date
+import scala.io.StdIn
 
 object Main {
-
-  val conf = new SparkConf()
-    .setAppName("Spark Analytics")
-    .setMaster("local[*]")
-    .set("spark.driver.host","127.0.0.1")
-
-  val sc = SparkContext.getOrCreate(conf)
 
   def server: Unit = {
 
     implicit val actorSystem = ActorSystem(Behaviors.empty, "akka-http")
-    val bindFuture = Http().newServerAt("127.0.0.1", 9001).bind(router.init)
+    // needed for the future flatMap/onComplete in the end
+    implicit val executionContext = actorSystem.executionContext
+    val bindFuture = Http().newServerAt("0.0.0.0", 9001).bind(router.init)
   }
 
   def main(args: Array[String]): Unit = {
     server
     println(s"Server now online. Please navigate to http://localhost:9001")
+    while (true) Thread.sleep(1)
   }
 
 }

@@ -14,9 +14,12 @@ RUN apt install -y gnupg \
 
 ADD . /app/
 
-RUN wget https://downloads.apache.org/spark/spark-3.1.2/spark-3.1.2-bin-hadoop3.2.tgz \
-&& tar -zxvf spark-*.tgz
+#RUN wget https://downloads.apache.org/spark/spark-3.1.2/spark-3.1.2-bin-hadoop3.2.tgz \
+#&& tar -zxvf spark-*.tgz
 
 WORKDIR /app/
 
-CMD /ops/sbt/bin/sbt run
+RUN /ops/sbt/bin/sbt compile \
+&& /ops/sbt/bin/sbt package
+
+CMD /ops/sbt/bin/sbt "run $KAFKA_SERVER $BATCH_TIME"

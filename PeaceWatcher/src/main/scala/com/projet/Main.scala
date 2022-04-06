@@ -9,8 +9,9 @@ object Main {
 
   def main(args: Array[String]): Unit = {
 
+    val server = if(args.size != 0) args(0) else "localhost"
     val  props = new Properties()
-    props.put("bootstrap.servers", "localhost:9092")
+    props.put("bootstrap.servers", s"$server:9092")
 
     props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
     props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")

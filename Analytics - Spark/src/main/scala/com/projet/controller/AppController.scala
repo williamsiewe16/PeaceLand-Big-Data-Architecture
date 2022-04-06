@@ -1,7 +1,8 @@
 package com.projet.controller
-import com.projet.Main.sc
+//import com.projet.Main.sc
 import akka.http.scaladsl.server.Directives.{complete, _}
 import com.projet.model.Message
+import org.apache.spark.{SparkConf, SparkContext}
 
 import java.util.Date
 // akka http
@@ -16,7 +17,14 @@ object AppController {
   implicit val AnalyticsFormat: spray.json.RootJsonFormat[Analytics] = jsonFormat4(Analytics)
 
   def getAnalytics() = {
-    val rdd = sc.textFile("../DataLake Consumer/data/test-*.json")
+    val conf = new SparkConf()
+      .setAppName("Spark Analytics")
+      .setMaster("local[*]")
+      .set("spark.driver.host","127.0.0.1")
+
+    val sc = SparkContext.getOrCreate(conf)
+
+    val rdd = sc.textFile("data/test-*.json")
       .map(Message.fromJson(_))
 
     // nombre de messages reçus

@@ -1,0 +1,89 @@
+version: '3'
+
+services:
+  
+  zookeeper:
+    image: kafka
+    container_name: zookeeper
+    restart: always
+    entrypoint: ["sh","-c","bin/zookeeper-server-start.sh config/zookeeper.properties"]
+    ports:
+      - "2181:2181"
+  
+
+  broker:
+    image: kafka
+    container_name: broker
+    restart: always
+    entrypoint: ["sh","-c","bin/kafka-server-start.sh config/server.properties"]
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: broker
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    depends_on:
+      - zookeeper
+  
+
+  peacewatcher:
+    image: peacewatcher
+    container_name: peacewatcher
+    restart: always
+    environment:
+      KAFKA_SERVER: broker
+    depends_on:
+      - zookeeper
+      - broker
+
+  datalake-consumer:
+    image: datalake-consumer
+    container_name: datalake-consumer
+    volumes:
+      - /var/opt/data:/app/data
+    environment:
+      KAFKA_SERVER: broker
+      BATCH_TIME: 60
+    depends_on:
+      - zookeeper
+      - broker
+
+
+  alert-consumer:
+    image: alert-consumer
+    container_name: alert-consumer
+    environment:
+      KAFKA_SERVER: broker
+      BATCH_TIME: 4
+    depends_on:
+      - zookeeper
+      - broker
+
+
+  analytics:
+    image: analytics
+    container_name: analytics
+    volumes:
+      - /var/opt/data:/app/data:ro
+    ports:
+      - "9001:9001"
+    depends_on:
+      - zookeeper
+      - broker
+      - peacewatcher
+      - alert-consumer
+      - analytics-ui
+
+  
+  analytics-ui:
+    image: analytics-ui
+    container_name: analytics-ui
+    ports:
+      - "8501:8501"
+    environment:
+      ANALYTICS_API: analytics
+    depends_on:
+      - zookeeper
+      - broker
+
+
+

@@ -1,5 +1,6 @@
 package com.projet
 
+import com.projet.Main.batchTime
 import com.projet.model.{Message, Person}
 import org.apache.spark.streaming.kafka010._
 import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
@@ -13,10 +14,11 @@ import java.util.Properties
 object Main {
 
   val resource_dir = "src/main/resources/"
-  val timeout = 5
+  val batchTime = 5
 
   def main(args: Array[String]): Unit = {
 
+    val server = if(args.size != 0) args(0) else "localhost"
     val topic=Array("quickstart-events")
 
     val sparkConf = new SparkConf()
@@ -25,7 +27,7 @@ object Main {
       .set("spark.driver.host","127.0.0.1")
 
     val kafkaParams = Map[String, Object](
-      "bootstrap.servers" -> "localhost:9092",
+      "bootstrap.servers" -> s"$server:9092",
       "key.deserializer"-> "org.apache.kafka.common.serialization.StringDeserializer",
       "value.deserializer" -> "org.apache.kafka.common.serialization.StringDeserializer",
       "group.id" -> "alert",
@@ -33,7 +35,8 @@ object Main {
       "enable.auto.commit" -> false*/
     )
 
-    val ssc = new StreamingContext(sparkConf, Seconds(timeout))
+    val finalBatchTime = if(args.size > 1) args(1).toInt else batchTime
+    val ssc = new StreamingContext(sparkConf, Seconds(finalBatchTime))
 
     val stream = KafkaUtils.createDirectStream[String, String](
       ssc,
