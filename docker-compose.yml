@@ -62,7 +62,7 @@ services:
   analytics:
     image: analytics
     container_name: analytics
-    volumes:
+    volumes:  
       - /var/opt/data:/app/data:ro
     ports:
       - "9001:9001"
@@ -70,6 +70,7 @@ services:
       - zookeeper
       - broker
       - peacewatcher
+      - datalake-consumer
       - alert-consumer
       - analytics-ui
 

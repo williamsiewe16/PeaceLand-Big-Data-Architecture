@@ -1,5 +1,4 @@
 package com.projet
-
 import com.projet.Main.batchTime
 import com.projet.model.{Message, Person}
 import org.apache.spark.streaming.kafka010._
@@ -8,7 +7,9 @@ import org.apache.spark.streaming.kafka010.LocationStrategies._
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.SparkConf
 
-import java.util.Properties
+import com.projet.model.Mail._
+
+
 
 
 object Main {
@@ -45,7 +46,8 @@ object Main {
     ).map(record => Message.fromJson(record.value()))
       .map(record => {
         val people = record.surroundingPeople.filter(e => e.peaceScore <= 4)
-        people.foreach(e => alert(record,e))
+        val alerts = people.map(e => toAlertMessage(record,e))
+        alert(record,alerts)
         record
       })
       .print()
@@ -56,11 +58,27 @@ object Main {
   }
 
 
-  def alert(record: Message, e: Person) = {
-    println(
+  def toAlertMessage(record: com.projet.model.Message, e: Person) = {
+
       s"""ALERT!! L'habitant ${e.nom} a un peace score = ${e.peaceScore}
          |Coordonnées GPS: (${record.location.latitude},${record.location.longitude})
-         |""".stripMargin)
+         |""".stripMargin
+
   }
+
+  def alert(record: Message, alerts: List[String]) = {
+
+    if(alerts.isEmpty){};
+    else {
+      send a new Mail (
+        from = ("bde.iui.g5@gmail.com", "PeaceLand"),
+        to = "bde.iui.g5@gmail.com",
+        subject = "PeaceLand Alert",
+        message = alerts.mkString("\n")
+      )
+    }
+
+  }
+
 
 }

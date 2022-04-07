@@ -11,3 +11,5 @@ libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-streaming-kafka-0-10" % sparkVersion,
   "org.apache.spark" %% "spark-streaming" % sparkVersion
 )
+
+libraryDependencies += "org.apache.commons" % "commons-email" % "1.5"

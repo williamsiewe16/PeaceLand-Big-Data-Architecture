@@ -13,7 +13,7 @@ case class PeaceWatcher(kafkaProducer: KafkaProducer[String,String]){
 
     val topic="quickstart-events"
 
-    (0 to 100).foreach((i) => {
+    (0 to 1000).foreach((i) => {
       val id = Random.nextInt(100)
       val lat = Random.nextFloat*30
       val lon = Random.nextFloat*30
